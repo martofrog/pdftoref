@@ -56,11 +56,32 @@ def googleSearch(title):
         for i in range(numresults):
             url = results.resultElements[i].URL
             r = re.compile("http://(.*)\.pdf",re.IGNORECASE)
-            if (r.match(url)){
-                              
-                              }
+            if (r.match(url)):
+                url = r.match(url).group()
+                type = "pdf"
+                return (url,type)
+            else:
+                r = re.compile("http://citeseer.ist.psu.edu/")
+                if(r.match(url)):
+                    type = "citeseer"
+                    return (url,type)
+                else:
+                    r = re.compile("http://portal.acm.org/")
+                    if(r.match(url)):
+                        type = "acm"
+                        return (url,type)
+                    else:
+                        r = re.compile("http://doi.ieeecomputersociety/")
+                        if(r.match(url)):
+                            type = "doi"
+                            return (url,type)
+                        else: 
+                            pass
+        type = "default"
+        return  (url,type)                          
     else:
         url= "#"
+        type = None
         return url
     
 
@@ -83,7 +104,7 @@ def getBibTex(url):
     '''
        
     # timeout in seconds
-    timeout = 15
+    timeout = 5
     socket.setdefaulttimeout(timeout)
     html = openUrl(url)
     if html:

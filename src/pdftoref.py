@@ -141,8 +141,8 @@ def do(content,urlFlag,bibtexFlag):
     except Exception.ReferencesNotFoundError, e:
         print e.message
         
-    #except IOError:
-        #print "File not found on filesystem."
+    except IOError:
+        print "File not found on filesystem."
         
     except (Pdfminer.pdfparser.PDFValueError, AssertionError):
         print "Unable to parse the pdf file."

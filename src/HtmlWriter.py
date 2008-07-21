@@ -90,6 +90,7 @@ def write(entries,titles,path,urlFlag,bibtexFlag):
     
     
     try:
+        dir = path[:len(path)- 4]
         os.mkdir(path[:len(path)- 4])
     except OSError:
         '''Directory already created'''
@@ -102,6 +103,7 @@ def write(entries,titles,path,urlFlag,bibtexFlag):
     
     #FIXME: Now we write in HTML ONLY the entries with a title but we must write all entries.
     dict = []
+    i=0
     for title in titles:
         for entry in entries:
             if entry.find(title) <> -1:
@@ -123,16 +125,18 @@ def write(entries,titles,path,urlFlag,bibtexFlag):
                     url = '#'
                     type= None
                 
-                if bibtexFlag and type <>"pdf":
-                    (bibtex, pdfLink) = spider.getBibTex(url,type)
-                elif type =="pdf":
-                    bibtex = None
-                    
+                if bibtexFlag:
+                    bibtex = spider.getBibTex(url,type)
+                
+                if True:
+                    pdfLink = spider.getOfflinePdf(url,type,filename,dir,i)
+  
                 else:
                     bibtex = None
                     pdfLink = None
                 
                 dict.append(  (title,url,entry,bibtex,pdfLink) )
+                i = i+1
                 break
 
                 

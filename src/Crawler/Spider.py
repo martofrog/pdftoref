@@ -1,7 +1,9 @@
 from SOAPpy import SOAPProxy
 from SOAPpy import Types
 import urllib2
+import urllib
 import socket
+import re
 
 # CONSTANTS
 _url = 'http://api.google.com/search/beta2'
@@ -82,7 +84,7 @@ def googleSearch(title):
     else:
         url= "#"
         type = None
-        return url
+        return (url,type)
     
 
     
@@ -93,7 +95,7 @@ def googleSearch(title):
 #        print '  url: ' + results.resultElements[i].URL + '\n'
 
 
-def getBibTex(url):
+def getBibTex(url,type):
     '''
     It is the function of the application that serach the bibxtex entry in the url 
     provided by Google WS. 
@@ -111,7 +113,7 @@ def getBibTex(url):
         #FIXME: finish the retreival
         #FIXME: Insert the timeout
         if url <> "#":
-            if url.find("citeseer.ist.psu.edu") <> -1:
+            if type == "citeseer":
                 bibtex = "BibTeX"
                 index = html.find(bibtex)
                 if index <> -1:
@@ -123,8 +125,8 @@ def getBibTex(url):
                     return html
                 else:
                      return None
-            elif url.find("doi.ieeecomputersociety") <> -1:
-                #Il pdf non si può scaricare è a pagamento
+            elif type == "doi":
+                #Il pdf non si puo' scaricare e' a pagamento
                 index = html.find("Popup.document.write(\'@")
                 if index <> -1:
                     html = html[index+len("Popup.document.write(\'"):]
@@ -133,7 +135,7 @@ def getBibTex(url):
                     return html.replace("&nbsp;"," ").replace("<xsl:text>","").replace("<br/>","\n")
                 else:
                     return None
-            elif url.find("portal.acm.org") <> -1:
+            elif type == "acm":
                 index = html.find("window.open('popBibTex")
                 if index <> -1:
                     html = html[index+len("window.open('"):]
@@ -145,7 +147,7 @@ def getBibTex(url):
                     return html
                 else:
                     return None
-            
+  
             
             
             
@@ -172,5 +174,35 @@ def openUrl(url):
     except (urllib2.URLError, socket.timeout):
         print "\n\n\t~ The url "+url+" is in timeout. Skipping it.\n"
         return None
+  
+
+def getOfflinePdf(url,type,filename,dir,i):
+    
+    timeout = 5
+    socket.setdefaulttimeout(timeout)
+    html = openUrl(url)
+    if html:
+        if type == "citeseer":
+            index = html.find(".pdf\"")
+            html = html[:index+4]
+            index = html.rfind("http://")
+            html = html[index:]
+
+            downloadPdf(html,filename,dir,i)
+        
+        
         
 
+    
+
+def downloadPdf(url,filename,dir,i):
+    """Copy the contents of a file from a given URL
+    to a local file.
+    """
+    webFile = urllib.urlopen(url)
+    localFile = open(dir+"/"+filename+"_ref_"+str(i)+".pdf", 'w')
+    localFile.write(webFile.read())
+    webFile.close()
+    localFile.close()
+    
+    

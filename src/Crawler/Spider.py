@@ -78,7 +78,7 @@ def getBibTex(url):
     '''
        
     # timeout in seconds
-    timeout = 5
+    timeout = 15
     socket.setdefaulttimeout(timeout)
     html = openUrl(url)
     if html:

@@ -2,6 +2,7 @@ import Crawler.Spider as spider
 import SOAPpy
 import socket
 import re
+import os
 
 _htmlHeader1 ="<html>\
 <head>\
@@ -86,9 +87,17 @@ def write(entries,titles,path,urlFlag,bibtexFlag):
     @param urlFlag: the boolean url Flag to do or no to search over internet
     @return bibtexFlag: the boolean bibtex Flag to do or no to search over internet
     '''
-    output = open(path[:len(path)- 4]+".html","w")
     
-
+    
+    try:
+        os.mkdir(path[:len(path)- 4])
+    except OSError:
+        '''Directory already created'''
+        pass
+    
+    filename = path[:len(path)][path[:len(path)].rfind("/")+1:]
+    output = open(path[:len(path)- 4]+"/"+filename[:len(filename)-4]+".html","w")
+    
     output.write(_htmlHeader1+"References for the article: "+path + _htmlHeader2)
     
     #FIXME: Now we write in HTML ONLY the entries with a title but we must write all entries.
@@ -99,24 +108,31 @@ def write(entries,titles,path,urlFlag,bibtexFlag):
                 
                 if urlFlag:
                     url = ''
+                    type = ''
                     try:
-                        url =  spider.googleSearch(title)
+                        (url,type) =  spider.googleSearch(title)
                     except SOAPpy.Types.faultType:
                         url='#'
+                        type= None
                         print "Soap failure on querying Google WS."
                     except (socket.timeout,socket.gaierror):
                         url='#'
+                        type= None
                         print "Connection lost."
                 else:
                     url = '#'
+                    type= None
                 
-                
-                if bibtexFlag:
-                    bibtex = spider.getBibTex(url)
+                if bibtexFlag and type <>"pdf":
+                    (bibtex, pdfLink) = spider.getBibTex(url,type)
+                elif type =="pdf":
+                    bibtex = None
+                    
                 else:
                     bibtex = None
+                    pdfLink = None
                 
-                dict.append(  (title,url,entry,bibtex) )
+                dict.append(  (title,url,entry,bibtex,pdfLink) )
                 break
 
                 

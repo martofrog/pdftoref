@@ -178,7 +178,7 @@ def openUrl(url):
 
 def getOfflinePdf(url,type,filename,dir,i):
     
-    timeout = 5
+    timeout = 15
     socket.setdefaulttimeout(timeout)
     html = openUrl(url)
     if html:
@@ -200,6 +200,7 @@ def downloadPdf(url,filename,dir,i):
     to a local file.
     """
     webFile = urllib.urlopen(url)
+    filename = filename.replace(".pdf","")
     localFile = open(dir+"/"+filename+"_ref_"+str(i)+".pdf", 'w')
     localFile.write(webFile.read())
     webFile.close()

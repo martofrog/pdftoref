@@ -76,6 +76,17 @@ _htmlFooter = '</div>\
 </div></body>\
 </html>'
 
+def getEntryFromBibTex(bibtex):
+    if bibtex==None:
+        return bibtex
+    else:
+        entry =""
+        r = re.compile("author = \"(.*)\",")
+        s = r.search(bibtex)
+        if (s):
+            entry = entry+" "+s.group()
+        return entry
+
 def write(entries,titles,path,urlFlag,bibtexFlag):
     '''
     It is the function of the application that write down into an html files all the entries
@@ -87,8 +98,6 @@ def write(entries,titles,path,urlFlag,bibtexFlag):
     @param urlFlag: the boolean url Flag to do or no to search over internet
     @return bibtexFlag: the boolean bibtex Flag to do or no to search over internet
     '''
-    
-    
     try:
         dir = path[:len(path)- 4]
         os.mkdir(path[:len(path)- 4])
@@ -107,7 +116,7 @@ def write(entries,titles,path,urlFlag,bibtexFlag):
     for title in titles:
         for entry in entries:
             if entry.find(title) <> -1:
-                
+                i=i+1
                 if urlFlag:
                     url = ''
                     type = ''
@@ -134,16 +143,11 @@ def write(entries,titles,path,urlFlag,bibtexFlag):
                 else:
                     bibtex = None
                     pdfLink = None
-                
-                dict.append(  (title,url,entry,bibtex,pdfLink) )
-                i = i+1
-                break
-
-                
-                
-                
+                    
+                getEntryFromBibTex(bibtex)
+                dict.append((title,url,entry,bibtex,pdfLink) )
+                break                
     output.write("<h1>References for the article: <i><a href=\""+path+"\">"+path+"</a></i></h1>\n<div id=\"content\"><ol>")
-    
     lenght =  len(titles)
     i=0
     while (i < lenght):
@@ -151,11 +155,8 @@ def write(entries,titles,path,urlFlag,bibtexFlag):
         url   = dict[i][1]
         entry = dict[i][2]
         bibtex = dict[i][3]
-
-        
         index = entry.find(title)
         printEntry = entry[:index]+ "<a href=\""+url+"\"><b>"+title+"</a></b>" + entry[index+len(title):]
-        
         try:
             output.write("<li>"+printEntry + _htmlPreBibtex + bibtex+ _htmlPostBibtex +"</li>")
         except TypeError :
@@ -165,5 +166,3 @@ def write(entries,titles,path,urlFlag,bibtexFlag):
     output.write("</ol>")
     output.write(_htmlFooter)
     output.close()
-
-        

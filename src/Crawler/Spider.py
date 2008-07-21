@@ -16,7 +16,7 @@ SOAP_TRUE = Types.booleanType(1)
 _license_key = 'Cu7YX75QFHLS3WD/7/4CO+GsI/jC69eb' 
 _query = ""
 _start = 0
-_maxResults = 10
+_maxResults = 3
 _filter = SOAP_FALSE
 _restrict = ''
 _safeSearch = SOAP_FALSE
@@ -53,10 +53,15 @@ def googleSearch(title):
                                                            
     numresults = len(results.resultElements)
     if numresults:
-        url = results.resultElements[0].URL
+        for i in range(numresults):
+            url = results.resultElements[i].URL
+            r = re.compile("http://(.*)\.pdf",re.IGNORECASE)
+            if (r.match(url)){
+                              
+                              }
     else:
         url= "#"
-    return url
+        return url
     
 
     
@@ -98,6 +103,7 @@ def getBibTex(url):
                 else:
                      return None
             elif url.find("doi.ieeecomputersociety") <> -1:
+                #Il pdf non si può scaricare è a pagamento
                 index = html.find("Popup.document.write(\'@")
                 if index <> -1:
                     html = html[index+len("Popup.document.write(\'"):]

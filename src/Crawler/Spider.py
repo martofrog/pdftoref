@@ -226,7 +226,8 @@ def downloadPdf(url,pathToSave):
     """Copy the contents of a file from a given URL
     to a local file.
     """
-    try:
+ 
+    try:  
         webFile = urllib.urlopen(url)
         localFile = open(pathToSave, 'w')
         localFile.write(webFile.read())
@@ -234,5 +235,7 @@ def downloadPdf(url,pathToSave):
         localFile.close()
     except IOError:
         print url
+    except socket.timeout:
+        pass
     
     

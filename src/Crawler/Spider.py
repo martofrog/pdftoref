@@ -62,22 +62,22 @@ def googleSearch(title):
             if (r.match(url)):
                 url = r.match(url).group()
                 type = "pdf"
-                return (url,type)
+                return (url,type,_query)
             else:
                 r = re.compile("http://citeseer.ist.psu.edu/")
                 if(r.match(url)):
                     type = "citeseer"
-                    return (url,type)
+                    return (url,type,_query)
                 else:
                     r = re.compile("http://portal.acm.org/")
                     if(r.match(url)):
                         type = "acm"
-                        return (url,type)
+                        return (url,type,_query)
                     else:
                         r = re.compile("http://doi.ieeecomputersociety/")
                         if(r.match(url)):
                             type = "doi"
-                            return (url,type)
+                            return (url,type,_query)
                         else: 
                             pass
         type = "default"

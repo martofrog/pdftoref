@@ -24,14 +24,14 @@ def main():
     the exctractor finishe, it writes the result into an html file. 
     '''
    
-    (content,flag,urlFlag,bibtexFlag) =  parser.parse(sys.argv)
+    (content,flag,urlFlag,bibtexFlag,downloadPdfFlag) =  parser.parse(sys.argv)
     if flag == 'None':
         parser.usage()
         sys.exit(2)
         
     elif flag == 'file':
         print("PdftoRef> Running on the file: "+ content)
-        do(content,urlFlag,bibtexFlag)
+        do(content,urlFlag,bibtexFlag,downloadPdfFlag)
 
          
     elif flag == 'dir':
@@ -48,7 +48,7 @@ def main():
         '''Itering over the files and extract the info one by one'''
         for each in pdfFiles:
             print("PdftoRef> Extracting data from file: "+ each)
-            do(content+each,urlFlag,bibtexFlag)
+            do(content+each,urlFlag,bibtexFlag,downloadPdfFlag)
 
 
 
@@ -70,7 +70,7 @@ def main():
 #        print "**Media min: "+ str(mediaMin)
 #        print "**Media max: "+ str(mediaMax)
 
-def do(content,urlFlag,bibtexFlag):
+def do(content,urlFlag,bibtexFlag,downloadPdfFlag):
     '''
     It is the function of the application that get the text from pdf using Pdfminer,
     extracts the entries and the title. At last write the html file with the relativa url
@@ -114,7 +114,7 @@ def do(content,urlFlag,bibtexFlag):
     #                    spinHtml = Spinner.startSpin("* Querying Google and writing down html file")
                     
                         '''Entries and title are written in an HTML files where is specified by content'''
-                        HtmlWriter.write(entries,titles,content,urlFlag,bibtexFlag)
+                        HtmlWriter.write(entries,titles,content,urlFlag,bibtexFlag,downloadPdfFlag)
                     
      #                   Spinner.stopSpin(spinHtml, "Done")
                     
@@ -141,8 +141,8 @@ def do(content,urlFlag,bibtexFlag):
     except Exception.ReferencesNotFoundError, e:
         print e.message
         
-    except IOError:
-        print "File not found on filesystem."
+#    except IOError:
+#        print "File not found on filesystem."
         
     except (Pdfminer.pdfparser.PDFValueError, AssertionError):
         print "Unable to parse the pdf file."

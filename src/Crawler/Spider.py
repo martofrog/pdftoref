@@ -33,13 +33,14 @@ def googleSearch(title):
     @return: the first url
     '''
     
-    _query=title
-
-    
+     
     # create SOAP proxy object
     google = SOAPProxy(_url, _namespace)
     
-
+    _query= google.doSpellingSuggestion( _license_key, title )
+    
+    if _query == None:
+        _query=title
     
     # call search method over SOAP proxy
     results = google.doGoogleSearch( _license_key, _query, 
@@ -106,7 +107,7 @@ def getBibTex(url,type):
     '''
        
     # timeout in seconds
-    timeout = 5
+    timeout = 10
     socket.setdefaulttimeout(timeout)
     html = openUrl(url)
     if html:
@@ -142,9 +143,11 @@ def getBibTex(url,type):
                     index = html.find(",'BibTex',")
                     html = html[:index]
                     html = openUrl("http://portal.acm.org/"+html)
-                    html = html[html.find('@')-1:]
-                    html = html[:html.find('}\r\n</pre>')-1:]
-                    return html
+                    index = html.find('@')
+                    if index <> -1:
+                        html = html[index - 1:]
+                        html = html[:html.find('}\r\n</pre>')-1:]
+                        return html
                 else:
                     return None
   
@@ -178,32 +181,55 @@ def openUrl(url):
 
 def getOfflinePdf(url,type,filename,dir,i):
     
-    timeout = 15
-    socket.setdefaulttimeout(timeout)
+    #timeout = 10
+    #socket.setdefaulttimeout(timeout)
+    
+    filename = filename[:len(filename)- 4]
+    pathToSave= dir+"/"+filename+"_ref_"+str(i)+".pdf"
+    
     html = openUrl(url)
     if html:
+        
         if type == "citeseer":
             index = html.find(".pdf\"")
-            html = html[:index+4]
-            index = html.rfind("http://")
-            html = html[index:]
-
-            downloadPdf(html,filename,dir,i)
+            if index <> -1:   
+                html = html[:index+4]
+                index = html.rfind("http://")
+                html = html[index:]
+                downloadPdf(html,pathToSave)
+                return pathToSave
+        
+        if type == "acm":
+            index = html.find("<A NAME=\"FullText\" HREF=\"")
+            if index <> -1:
+                html = html[index:]
+                index = html.find("\"")
+                html = html[:index]
+                downloadPdf("http://portal.acm.org/"+html,pathToSave)
+                return pathToSave
+        
+        if type == "pdf":
+            downloadPdf(url,pathToSave)
+            return pathToSave
+    
+    return None
         
         
         
 
     
 
-def downloadPdf(url,filename,dir,i):
+def downloadPdf(url,pathToSave):
     """Copy the contents of a file from a given URL
     to a local file.
     """
-    webFile = urllib.urlopen(url)
-    filename = filename.replace(".pdf","")
-    localFile = open(dir+"/"+filename+"_ref_"+str(i)+".pdf", 'w')
-    localFile.write(webFile.read())
-    webFile.close()
-    localFile.close()
+    try:
+        webFile = urllib.urlopen(url)
+        localFile = open(pathToSave, 'w')
+        localFile.write(webFile.read())
+        webFile.close()
+        localFile.close()
+    except IOError:
+        print url
     
     

@@ -84,10 +84,62 @@ def getEntryFromBibTex(bibtex):
         r = re.compile("author = \"(.*)\",")
         s = r.search(bibtex)
         if (s):
-            entry = entry+" "+s.group()
+            temp = s.group()
+            temp = temp.replace("author = ","")
+            temp = temp.replace("\"","")
+            entry = entry+" "+temp
+        r = re.compile("title = \"(.*)\",")
+        s = r.search(bibtex)
+        if (s):
+            temp = s.group()
+            temp = temp.replace("title = ","")
+            temp = temp.replace("\"","")
+            entry = entry+" "+temp
+        r = re.compile("journal = \"(.*)\",")
+        s = r.search(bibtex)
+        if (s):
+            temp = s.group()
+            temp = temp.replace("journal = ","")
+            temp = temp.replace("\"","")
+            entry = entry+" "+temp
+        r = re.compile("year = \"(.*)\",")
+        s = r.search(bibtex)
+        if (s):
+            temp = s.group()
+            temp = temp.replace("year = ","")
+            temp = temp.replace("\"","")
+            entry = entry+" "+temp
+        r = re.compile("pages = \"(.*)\",")
+        s = r.search(bibtex)
+        if (s):
+            temp = s.group()
+            temp = temp.replace("pages = ","")
+            temp = temp.replace("\"","")
+            entry = entry+" "+temp
+        r = re.compile("url = \"(.*)\",")
+        s = r.search(bibtex)
+        if (s):
+            temp = s.group()
+            temp = temp.replace("url = ","")
+            temp = temp.replace("\"","")
+            entry = entry+" "+temp               
         return entry
 
-def write(entries,titles,path,urlFlag,bibtexFlag):
+def getTitleFromBibtex(bibtex):
+    if (bibtex==None):
+        return bibtex
+    else:
+        r = re.compile("title = \"(.*)\",")
+        s = r.search(bibtex)
+        if (s):
+            temp = s.group()
+            temp = temp.replace("title = ","")
+            temp = temp.replace("\"","")
+            return temp
+        else:
+            return None
+        
+def write(entries,titles,path,urlFlag,bibtexFlag,downloadPdfFlag):
     '''
     It is the function of the application that write down into an html files all the entries
     of the articles, searching the URI of title on the internet via Google WS and searchin Bibtex.
@@ -133,20 +185,32 @@ def write(entries,titles,path,urlFlag,bibtexFlag):
                 else:
                     url = '#'
                     type= None
-                
+                    
                 if bibtexFlag:
                     bibtex = spider.getBibTex(url,type)
-                
-                if True:
-                    pdfLink = spider.getOfflinePdf(url,type,filename,dir,i)
-  
                 else:
                     bibtex = None
+                    
+                if downloadPdfFlag:
+                    pdfLink = spider.getOfflinePdf(url,type,filename,dir,i)
+                else:
                     pdfLink = None
                     
-                getEntryFromBibTex(bibtex)
+                titleB = None
+                
+                if bibtex:
+                        entryB = getEntryFromBibTex(bibtex)
+                        titleB = getTitleFromBibtex(bibtex)
+                
+                if (titleB<>None):
+                    entry = entryB
+                    title = titleB
+                      
+                 
                 dict.append((title,url,entry,bibtex,pdfLink) )
                 break                
+    
+    
     output.write("<h1>References for the article: <i><a href=\""+path+"\">"+path+"</a></i></h1>\n<div id=\"content\"><ol>")
     lenght =  len(titles)
     i=0
@@ -155,8 +219,13 @@ def write(entries,titles,path,urlFlag,bibtexFlag):
         url   = dict[i][1]
         entry = dict[i][2]
         bibtex = dict[i][3]
+        pdfLink = dict[i][4]
         index = entry.find(title)
-        printEntry = entry[:index]+ "<a href=\""+url+"\"><b>"+title+"</a></b>" + entry[index+len(title):]
+        
+        if pdfLink:
+            printEntry = entry[:index]+ "<a href=\""+url+"\"><b>"+title+"</a></b>" + entry[index+len(title):] + "<a href=\""+ pdfLink+"\">[Pdf]</a>"
+        else:
+            printEntry = entry[:index]+ "<a href=\""+url+"\"><b>"+title+"</a></b>" + entry[index+len(title):]
         try:
             output.write("<li>"+printEntry + _htmlPreBibtex + bibtex+ _htmlPostBibtex +"</li>")
         except TypeError :

@@ -14,9 +14,10 @@ def parse(argv):
     flag= 'None'
     url = False
     bibtex = False
+    downloadPdf = False
     
     try:
-        opts, args = getopt.getopt(argv[1:], "hf:d:ub", ["help","file=","dir=","url","bibtex"])
+        opts, args = getopt.getopt(argv[1:], "hf:d:ubp", ["help","file=","dir=","url","bibtex","pdf"])
     except getopt.GetoptError, err:
          return (content,flag,url,bibtex)
 
@@ -35,10 +36,13 @@ def parse(argv):
         elif o in ("-b", "--bibtex"):
             bibtex=True
             url=True
+        elif o in ("-p", "--pdf"):
+            downloadPdf=True
+            url=True
         else:
             continue
     
-    return (content,flag,url,bibtex)
+    return (content,flag,url,bibtex,downloadPdf)
 
 def usage():
     print "     Usage: \n\n \
@@ -47,6 +51,7 @@ def usage():
     -d directory  --dir=directory     Run into a directory \n \
     -u            --url               Get the title url \n \
     -b            --bibtex            Get the bibtex article \n \n \
+    -p            --pdf               Download the article cited in the references as pdf \n \n \
     Examples:\n\n \
     pdftoref -b -u -f ~/file.pdf\n \
     pdftoref --url --bibtex --file=~/file.pdf\n \

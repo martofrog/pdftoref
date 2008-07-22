@@ -194,11 +194,13 @@ def getOfflinePdf(url,type,filename,dir,i):
     if html:
         
         if type == "citeseer":
-            index = html.find(".pdf\"")
+            index = html.find("PDF</a>")
             if index <> -1:   
+                html = html[:index]
+                index = html.rfind(".pdf';")
                 html = html[:index+4]
-                index = html.rfind("http://")
-                html = html[index:]
+                index = html.rfind("self.status='")
+                html = html[index+len("self.status='"):]
                 downloadPdf(html,pathToSave)
                 return pathToSave
         

@@ -186,7 +186,7 @@ def write(entries,titles,path,urlFlag,bibtexFlag,downloadPdfFlag):
                     url = '#'
                     type= None
                     
-                if bibtexFlag:
+                if bibtexFlag and type <> 'pdf':
                     bibtex = spider.getBibTex(url,type)
                 else:
                     bibtex = None

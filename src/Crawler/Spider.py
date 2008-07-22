@@ -107,7 +107,7 @@ def getBibTex(url,type):
     '''
        
     # timeout in seconds
-    timeout = 10
+    timeout = 20
     socket.setdefaulttimeout(timeout)
     html = openUrl(url)
     if html:
@@ -141,15 +141,18 @@ def getBibTex(url,type):
                 if index <> -1:
                     html = html[index+len("window.open('"):]
                     index = html.find(",'BibTex',")
-                    html = html[:index]
-                    html = openUrl("http://portal.acm.org/"+html)
-                    index = html.find('@')
-                    if index <> -1:
-                        html = html[index - 1:]
-                        html = html[:html.find('}\r\n</pre>')-1:]
-                        return html
-                else:
-                    return None
+                    subUrl = html[:index]
+                    html = openUrl("http://portal.acm.org/"+subUrl)
+                    if html:
+                        index = html.find('@')
+                        if index <> -1:
+                            html = html[index - 1:]
+                            html = html[:html.find('}\r\n</pre>')-1:]
+                            return html
+                        else:
+                            return None
+                    else:
+                        return None
   
             
             

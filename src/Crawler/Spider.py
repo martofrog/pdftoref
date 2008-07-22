@@ -81,11 +81,11 @@ def googleSearch(title):
                         else: 
                             pass
         type = "default"
-        return  (url,type)                          
+        return  (url,type,_query)                          
     else:
         url= "#"
         type = None
-        return (url,type)
+        return (url,type,_query)
     
 
     

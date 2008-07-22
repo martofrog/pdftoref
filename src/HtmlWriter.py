@@ -172,8 +172,12 @@ def write(entries,titles,path,urlFlag,bibtexFlag,downloadPdfFlag):
                 if urlFlag:
                     url = ''
                     type = ''
+                    titleG=''
                     try:
-                        (url,type) =  spider.googleSearch(title)
+                        (url,type,titleG) =  spider.googleSearch(title)
+                        if (titleG<>None):
+                            entry = entry.replace(title,titleG)
+                            title = titleG
                     except SOAPpy.Types.faultType:
                         url='#'
                         type= None
